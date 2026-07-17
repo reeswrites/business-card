@@ -1,0 +1,6 @@
+{
+  "server": { "baseDir": "." },
+  "files": ["index.html"],
+  "open": true,
+  "notify": false
+}

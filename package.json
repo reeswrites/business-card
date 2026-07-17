@@ -1,0 +1,13 @@
+{
+  "name": "business-card",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HTML/CSS business card — single-file screen preview and print-ready PDF source.",
+  "scripts": {
+    "dev": "lite-server",
+    "start": "lite-server"
+  },
+  "devDependencies": {
+    "lite-server": "^2.6.1"
+  }
+}
