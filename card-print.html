@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Business Card — PRINT (Staples 3.5×2, 0.125&quot; bleed)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Caveat:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     PRINT FILE — Staples business card
+       Trim (final card): 3.5in x 2in
+       File (with bleed):  3.75in x 2.25in  (0.125in bleed all sides)
+       Safe area:          keep content 0.125in inside the trim
+     Export: Chrome ▸ Print ▸ Save as PDF, paper "3.75 x 2.25 in",
+             margins None, Background graphics ON. No crop marks (Staples adds none).
+     ============================================================ */
+  @page { size: 3.75in 2.25in; margin: 0; }
+
+  :root{
+    --text-ink:        #23180F;
+    --annotation:      #33518A;
+    --annotation-soft: #9AA6B8;
+    --wordart-face-1:  #FFE95C;
+    --wordart-face-2:  #FFD21F;
+    --wordart-face-3:  #FDB008;
+    --wordart-face-4:  #F08A02;
+    --wordart-face-5:  #E97C00;
+    --wordart-outline: #6E2708;
+    --card-bg:         #FAF6EC; /* warm off-white — printed full-bleed as ink */
+  }
+  *{ box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  html,body{ margin:0; padding:0; }
+  body{ font-family:'IBM Plex Mono',monospace; background:#6b6459; }
+
+  /* SHEET = the full file area incl. bleed (3.75 x 2.25). Cream bleeds to every edge. */
+  .sheet{
+    position:relative;
+    width:3.75in;
+    height:2.25in;
+    background:var(--card-bg);
+    overflow:hidden;
+  }
+
+  /* CARD = the TRIM area (3.5 x 2), inset only the bleed (0.125in) from the sheet. Matching the
+     trim's 1.75 aspect keeps the tuned composition centred exactly as in the mockup. cqw resolves
+     against this 3.5in width. */
+  .card{
+    position:absolute;
+    top:0.125in; left:0.125in;
+    width:3.5in; height:2in;
+    background:transparent;      /* cream shows through from the sheet */
+    container-type:inline-size;
+    overflow:visible;
+  }
+  /* scale the whole composition to 82% so it nests inside the hand-drawn frame with a margin
+     (and stays clear of the safe line). Uniform — keeps every proportion. */
+  .front{ height:100%; padding:6.1cqw 6.3cqw 5.7cqw; display:flex; flex-direction:column; justify-content:center;
+          transform:scale(0.78); transform-origin:center center; }
+
+  /* hand-drawn frame, on the CARD (unscaled) just inside the safe line so it encloses the content */
+  .card-border{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible; z-index:0; }
+  .card-border path{ fill:none; stroke:var(--annotation); stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; opacity:0.65; vector-effect:non-scaling-stroke; }
+
+
+  .name-line{ display:flex; align-items:center; justify-content:center; overflow:visible; margin:0.6cqw 0 0 0; }
+  /* WordArt name — self-contained SVG (see markup). Sized to ~92% of the content width. */
+  .name-svg{ display:block; width:92cqw; height:auto; overflow:visible; transform:translateX(0.65cqw); }
+
+  /* align-items:center centres the fixed-width brace tracks on the card; the note rows below
+     stretch full-width and stay left via their own justify-content. */
+  .bottom-block{ display:flex; flex-direction:column; margin-top:1.2cqw; align-items:center; }
+  .keep-row{ display:flex; align-self:flex-start; align-items:center; justify-content:flex-start; margin:3cqw 0 0.2cqw 4cqw; }
+  .keep-text{ font-family:'Caveat',cursive; font-weight:700; font-size:5.2cqw; letter-spacing:0.03cqw; color:var(--annotation); white-space:nowrap; }
+  .arrow-row{ display:flex; align-self:flex-start; justify-content:flex-start; margin:0 0 -0.6cqw 9cqw; }
+  .arrow-icon{ width:9cqw; height:5.2cqw; overflow:visible; }
+  .arrow-icon path{ fill:none; stroke:var(--annotation); stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
+  .arrow-icon .pass-main{ stroke-width:1.6; opacity:0.95; }
+  .arrow-icon .pass-over{ stroke-width:1.05; opacity:0.4; }
+
+  /* text-align:center centres the address glyphs (the trailing letter-space no longer skews it) */
+  .email{ font-family:'IBM Plex Mono',monospace; font-size:3.9cqw; line-height:1.2; letter-spacing:2.8cqw; white-space:nowrap; color:var(--text-ink); text-align:center; }
+
+  .above-annotate{ display:flex; font-family:'IBM Plex Mono',monospace; font-size:3.9cqw; margin-bottom:0.55cqw; }
+  .slot-email{ width:calc(5ch + 5 * 2.8cqw); }
+  .slot-domain{ width:calc(14ch + 13 * 2.8cqw); }
+  .slot-domain.filled{ display:flex; flex-direction:column; align-items:center; }
+
+  .bracket-svg{ width:100%; display:block; color:var(--annotation); overflow:visible; }
+  .bracket-svg.top, .bracket-svg.bottom{ height:1.9cqw; }
+  .bracket-svg.nested{ height:1.6cqw; }
+  .bracket-svg path{ fill:none; stroke:currentColor; stroke-linecap:round; vector-effect:non-scaling-stroke; }
+  .bracket-svg .pass-main{ stroke-width:1.5; opacity:0.95; }
+  .bracket-svg .pass-over{ stroke-width:1.05; opacity:0.4; }
+
+  .annotate-label{ font-family:'IBM Plex Mono',monospace; font-size:1.45cqw; line-height:1.2; letter-spacing:0.15em; text-transform:lowercase; white-space:nowrap; color:var(--text-ink); }
+  .slot-domain .annotate-label{ margin-bottom:0.5cqw; }
+
+  .below-annotate{ display:flex; flex-direction:column; align-items:center; width:calc(19ch + 18 * 2.8cqw); font-family:'IBM Plex Mono',monospace; font-size:3.9cqw; margin-top:0.4cqw; }
+  .below-annotate .annotate-label{ margin-top:0.8cqw; }
+  .sub-row{ display:flex; align-items:flex-start; width:100%; }
+  .ghost-spacer{ font-family:'IBM Plex Mono',monospace; font-size:3.9cqw; letter-spacing:2.8cqw; visibility:hidden; white-space:nowrap; flex-shrink:0; }
+  .nested-annotate{ width:calc(11ch + 10 * 2.8cqw); display:flex; flex-direction:column; align-items:center; }
+  .sub-label{ margin-top:0.4cqw; font-family:'IBM Plex Mono',monospace; font-weight:500; font-size:1.3cqw; letter-spacing:0.12em; text-transform:lowercase; color:var(--text-ink); white-space:nowrap; }
+  .below-annotate .bracket-svg{ margin-top:1cqw; }
+
+  .brand-icon{ height:3.3cqw; width:auto; display:block; fill:currentColor; color:var(--annotation); overflow:visible; }
+  .brand-icon-fill{ height:3.6cqw; width:auto; display:block; margin:0.3cqw auto; color:var(--annotation); overflow:visible; }
+  .brand-row{ display:flex; gap:1.1cqw; align-items:center; justify-content:center; }
+  .brand-plus{ color:var(--annotation); font-family:'IBM Plex Mono',monospace; font-weight:500; font-size:2.9cqw; line-height:1; display:flex; align-items:center; }
+
+  /* ---- SCREEN-ONLY: scale up for viewing + show trim/safe guides. Never printed. ---- */
+  .guide{ position:absolute; pointer-events:none; display:none; }
+  .view-toggle{ display:none; }
+  @media screen{
+    body{ display:flex; align-items:center; justify-content:center; min-height:100vh; padding:40px; }
+    .sheet{ transform:scale(2.4); transform-origin:center; box-shadow:0 20px 60px rgba(0,0,0,0.4); }
+    /* trim line = edge of finished card (0.125in in from the sheet) */
+    .guide{ display:block; }
+    .guide.trim{ top:0.125in; left:0.125in; width:3.5in; height:2in; outline:1px dashed rgba(220,60,60,0.9); }
+    /* safe line = keep content inside this (another 0.125in in from trim) */
+    .guide.safe{ top:0.25in; left:0.25in; width:3.25in; height:1.75in; outline:1px dashed rgba(40,120,220,0.8); }
+
+    /* toggle button (screen only) */
+    .view-toggle{ display:inline-block; position:fixed; top:16px; left:16px; z-index:10;
+      font:600 13px/1 'IBM Plex Mono',monospace; padding:9px 14px; border:1px solid #33518A;
+      background:#fff; color:#33518A; border-radius:6px; cursor:pointer; }
+
+    /* CUT view: sheet shrinks to trim, card flush, guides off — shows the finished card */
+    .show-cut .sheet{ width:3.5in; height:2in; }
+    .show-cut .card{ top:0; left:0; }
+    .show-cut .guide{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+  <button class="view-toggle"
+    onclick="var c=document.body.classList.toggle('show-cut'); this.textContent=c?'◱ Show bleed + guides':'✂ Show cut result';">✂ Show cut result</button>
+
+  <div class="sheet">
+    <div class="card">
+
+      <svg class="card-border" viewBox="0 0 700 400" preserveAspectRatio="none" aria-hidden="true">
+        <!-- just inside the safe line; encloses the content (which is scaled to nest within it) -->
+        <path d="M30,26 C 150,22 260,28 380,24 C 490,21 592,27 672,25 C 675,100 669,190 673,264 C 675,310 670,350 672,376 C 560,379 440,374 320,377 C 205,380 105,375 28,377 C 25,305 31,215 27,150 C 25,100 31,58 30,26 Z"/>
+      </svg>
+
+      <div class="front">
+
+        <div class="name-line">
+          <!-- WordArt as self-contained SVG: gradient face + 3D extrusion baked in, no background-clip
+               (that CSS trick desyncs in print RIPs — the Staples proof doubled because of it). -->
+          <svg class="name-svg" viewBox="0 14 700 90" aria-label="Rees">
+            <defs>
+              <linearGradient id="goldFace" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#FFE95C"/>
+                <stop offset="26%" stop-color="#FFD21F"/>
+                <stop offset="58%" stop-color="#FDB008"/>
+                <stop offset="84%" stop-color="#F08A02"/>
+                <stop offset="100%" stop-color="#E97C00"/>
+              </linearGradient>
+            </defs>
+            <g font-family="Anton, Impact, sans-serif" font-size="100" text-anchor="middle">
+              <!-- 3D extrusion: offset copies falling down-left (deepest first) -->
+              <text x="340.4" y="99.6" fill="#6F2208">Rees</text>
+              <text x="341.2" y="98.8" fill="#6F2208">Rees</text>
+              <text x="342.0" y="98.0" fill="#762609">Rees</text>
+              <text x="342.8" y="97.2" fill="#7C2909">Rees</text>
+              <text x="343.6" y="96.4" fill="#822C0A">Rees</text>
+              <text x="344.4" y="95.6" fill="#89300B">Rees</text>
+              <text x="345.2" y="94.8" fill="#8F340C">Rees</text>
+              <text x="346.0" y="94.0" fill="#96380D">Rees</text>
+              <text x="346.8" y="93.2" fill="#9C3C0E">Rees</text>
+              <text x="347.6" y="92.4" fill="#A2400F">Rees</text>
+              <text x="348.4" y="91.6" fill="#A2400F">Rees</text>
+              <text x="349.2" y="90.8" fill="#A2400F">Rees</text>
+              <!-- gold gradient face -->
+              <text x="350" y="90" fill="url(#goldFace)" stroke="#6E2708" stroke-width="0.9" paint-order="stroke">Rees</text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="bottom-block">
+
+          <div class="keep-row">
+            <span class="keep-text">let's keep in touch!</span>
+          </div>
+
+          <div class="arrow-row">
+            <svg class="arrow-icon" viewBox="0 0 60 34" aria-hidden="true">
+              <path class="pass-main" d="M3,4 C 13,3.2 24,6 32,12 C 39,17.4 43,23 45,30"/>
+              <path class="pass-over" d="M4.2,4.9 C 13.8,4.1 24.6,6.8 32.6,12.7 C 39.4,18 43.4,23.4 45.4,29.6"/>
+              <path class="pass-main" d="M38.5,25.5 C 41,27 43.5,28.6 45.2,30.8"/>
+              <path class="pass-main" d="M50.5,24.2 C 48.6,26.4 46.6,28.4 45.2,30.8"/>
+            </svg>
+          </div>
+
+          <!-- upper track: website, over just "reeswrites.com" -->
+          <div class="above-annotate">
+            <div class="slot-email"></div>
+            <div class="slot-domain filled">
+              <div class="annotate-label">
+                <svg viewBox="0 0 26 23" class="brand-icon-fill" aria-label="website"><rect x="3" y="2.5" width="20" height="17.5" rx="2.6" fill="currentColor"/><line x1="4.4" y1="7.3" x2="21.6" y2="7.3" stroke="var(--card-bg)" stroke-width="1.3"/><g fill="var(--card-bg)" stroke="none"><circle cx="6.7" cy="4.9" r="0.85"/><circle cx="9.6" cy="4.9" r="0.85"/><circle cx="12.5" cy="4.9" r="0.85"/></g><path d="M9,9 L9,18.6 L11.6,16 L13.9,19.9 L15.7,18.9 L13.5,15 L17.4,15 Z" fill="var(--card-bg)"/></svg>
+              </div>
+              <svg class="bracket-svg top" viewBox="0 0 100 14" preserveAspectRatio="none">
+                <path class="pass-main" d="M1.5,12.7 C1.1,8.3 3.0,6.9 6.5,6.7 C11,5.7 16,8.1 22,6.5 C28,5.6 34,8.2 42,6.4 C46.5,6.2 47.8,4.8 49.8,1.2 C51.9,5.0 53.2,6.5 57,6.6 C63,8.1 69,5.7 75,7.9 C81,6.0 87,8.2 93.5,6.7 C97.7,7.0 98.9,8.6 98.5,12.7"/>
+                <path class="pass-over" d="M6.5,6.8 C11,5.8 16,8.0 22,6.6 C28,5.7 34,8.1 42,6.5 C46.5,6.3 47.8,5.0 49.9,1.6 C52.0,5.1 53.2,6.6 57,6.7 C63,8.0 69,5.8 75,7.8 C81,6.1 87,8.1 93.5,6.8"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="email">talk@reeswrites.com</div>
+
+          <!-- lower track: handle nested closest to the text, "email" bracket encloses it -->
+          <div class="below-annotate">
+            <div class="sub-row">
+              <span class="ghost-spacer">talk</span>
+              <div class="nested-annotate">
+                <svg class="bracket-svg nested" viewBox="0 0 100 14" preserveAspectRatio="none">
+                  <path class="pass-main" d="M1.5,1.4 C1.1,5.8 3.0,7.0 6.5,7.2 C11,8.3 16,5.9 22,7.4 C28,8.4 34,5.8 42,7.5 C46.5,7.7 47.8,9.2 49.8,12.8 C51.9,8.9 53.2,7.4 57,7.3 C63,5.9 69,8.2 75,6.2 C81,7.9 87,5.8 93.5,7.2 C97.7,7.0 98.9,5.5 98.5,1.4"/>
+                  <path class="pass-over" d="M6.5,7.2 C11,8.2 16,5.9 22,7.4 C28,8.3 34,5.9 42,7.5 C46.5,7.7 47.8,9.0 49.9,12.4 C52.0,8.8 53.2,7.4 57,7.3 C63,5.9 69,8.1 75,6.2 C81,7.8 87,5.9 93.5,7.2"/>
+                </svg>
+                <div class="sub-label">
+                  <span class="brand-row" aria-label="twitter and substack">
+                    <svg viewBox="0 0 24 24" class="brand-icon"><path d="M22.46,6c-0.77,0.35-1.6,0.58-2.46,0.69c0.88-0.53,1.56-1.37,1.88-2.38c-0.83,0.5-1.75,0.85-2.72,1.05C18.37,4.5,17.26,4,16.05,4c-2.35,0-4.27,1.92-4.27,4.29c0,0.34,0.04,0.67,0.11,0.98C8.28,9.09,5.11,7.38,2.98,4.79c-0.37,0.63-0.58,1.37-0.58,2.15c0,1.49,0.75,2.81,1.91,3.56c-0.71,0-1.37-0.2-1.95-0.5v0.03c0,2.08,1.48,3.82,3.44,4.21c-0.36,0.1-0.74,0.15-1.13,0.15c-0.27,0-0.54-0.03-0.8-0.08c0.54,1.69,2.11,2.95,4,2.98C6.28,18.99,4.79,19.5,3.14,19.5c-0.29,0-0.57-0.02-0.85-0.05C4.05,20.66,6.05,21.29,8.2,21.29c7.55,0,11.67-6.25,11.67-11.67v-0.53C20.68,7.6,21.4,6.85,22.46,6z"/></svg>
+                    <span class="brand-plus">+</span>
+                    <svg viewBox="0 0 24 24" class="brand-icon"><path d="M3,3.8 H21 V6.2 H3 Z M3,8.3 H21 V10.7 H3 Z M3,12.8 H21 V21.5 L12,16.8 L3,21.5 Z"/></svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <svg class="bracket-svg bottom" viewBox="0 0 100 14" preserveAspectRatio="none">
+              <path class="pass-main" d="M1.5,1.4 C1.1,5.8 3.0,7.0 6.5,7.2 C11,8.3 16,5.9 22,7.4 C28,8.4 34,5.8 42,7.5 C46.5,7.7 47.8,9.2 49.8,12.8 C51.9,8.9 53.2,7.4 57,7.3 C63,5.9 69,8.2 75,6.2 C81,7.9 87,5.8 93.5,7.2 C97.7,7.0 98.9,5.5 98.5,1.4"/>
+              <path class="pass-over" d="M6.5,7.2 C11,8.2 16,5.9 22,7.4 C28,8.3 34,5.9 42,7.5 C46.5,7.7 47.8,9.0 49.9,12.4 C52.0,8.8 53.2,7.4 57,7.3 C63,5.9 69,8.1 75,6.2 C81,7.8 87,5.9 93.5,7.2"/>
+            </svg>
+            <div class="annotate-label">
+              <svg viewBox="0 0 24 24" class="brand-icon-fill" aria-label="email"><rect x="2.5" y="5" width="19" height="14" rx="1.6" fill="currentColor"/><path d="M3.4,6 L12,13 L20.6,6" fill="none" stroke="var(--card-bg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- screen-only alignment guides (dashed): red = trim/cut, blue = safe area. Not printed. -->
+    <div class="guide trim"></div>
+    <div class="guide safe"></div>
+  </div>
+
+</body>
+</html>
